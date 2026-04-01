@@ -11,10 +11,21 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id          String          @id @default(cuid())
+  name        String?
+  email       String          @unique
+  password    String          // เก็บแบบ Hashed เท่านั้น!
+  transactions  Transaction[] // เชื่อมไปยัง Transaction
+  createdAt   DateTime        @default(now())
+}
+
 model Transaction {
   id          String          @id @default(cuid()) // ไอดีแบบสุ่มที่เดายาก
   title       String          // ชื่อรายการเช่น "ซื้อกาแฟ"
   amount      Float           // จำนวนเงิน เช่น 60.50
   type        String          // "INCOME" (รายรับ) หรือ "EXPENSE" (รายจ่าย)
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime        @default(now()) // บันทึกวันเวลาอัตโนมัติ
 }

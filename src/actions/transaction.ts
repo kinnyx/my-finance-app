@@ -1,9 +1,16 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 
 export async function createTransaction(formData: FormData) {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+        throw new Error("คุณต้องเข้าสู่ระบบก่อน")
+    }
+
     // 1. ดึงข้อมูลจากฟอร์มตามชื่อ 'name' ใน input
     const title = formData.get("title") as string;
     const amount = parseFloat(formData.get("amount") as string);
