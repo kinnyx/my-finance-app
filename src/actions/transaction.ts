@@ -25,6 +25,7 @@ export async function createTransaction(formData: FormData) {
             title: title,
             amount: amount,
             type: type, // "INCOME" หรือ "EXPENSE"
+            userId: session.user.id,
         },
     });
 

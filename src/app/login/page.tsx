@@ -1,7 +1,7 @@
 import { signIn } from "@/auth";
 import Link from "next/link";
-import { AuthError } from "next-auth";
-import { error } from "console";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export default function LoginPage() {
     return (
@@ -22,10 +22,16 @@ export default function LoginPage() {
                             await signIn("credentials", {
                                 email:  formData.get("email"),
                                 password: formData.get("password"),
-                                redirectTo: "/", // login สำเร็จให้กลับหน้าแรก
+                                redirect: false, // login สำเร็จให้กลับหน้าแรก
                             });
+
+                            // บังคับให้ Next.js ไปเช็ค Session ใหม่ที่หน้าแรก
+                            revalidatePath("/");
+
+                            // แล้วค่อยส่งผู้ใช้ไปหน้าแรกด้วยวิธีที่แน่นอนกว่า
+                            redirect("/");
                         } catch (error) {
-                            if (error instanceof AuthError) {
+                            if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
                                 // จัดการ Error เช่น รหัสผ่านผิด (ในที่นี้เราให้มันโยน Error ไปก่อน)
                                 throw error;
                             }

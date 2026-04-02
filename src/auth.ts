@@ -30,4 +30,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
         }),
     ],
+    callbacks: {
+        async session({ session, token }) {
+            if (token.sub && session.user) {
+                session.user.id = token.sub; // sub คือ ID ของ User จาก Database
+            }
+            return session;
+        }
+    }
 })
