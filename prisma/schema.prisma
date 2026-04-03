@@ -16,7 +16,7 @@ model User {
   name        String?
   email       String          @unique
   password    String          // เก็บแบบ Hashed เท่านั้น!
-  transactions  Transaction[] // เชื่อมไปยัง Transaction
+  wallet      Wallet[]        // เชื่อมไปยัง Wallet
   createdAt   DateTime        @default(now())
 }
 
@@ -25,7 +25,17 @@ model Transaction {
   title       String          // ชื่อรายการเช่น "ซื้อกาแฟ"
   amount      Float           // จำนวนเงิน เช่น 60.50
   type        String          // "INCOME" (รายรับ) หรือ "EXPENSE" (รายจ่าย)
+  category    String          @default("OTHER") 
+  walletId    String
+  wallet      Wallet          @relation(fields: [walletId], references: [id], onDelete: Cascade)  
+  createdAt   DateTime        @default(now()) // บันทึกวันเวลาอัตโนมัติ
+}
+
+model Wallet {
+  id          String          @id @default(cuid())
+  name        String          
   userId      String
   user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime        @default(now()) // บันทึกวันเวลาอัตโนมัติ
+  transactions  Transaction[]  
+  createdAt   DateTime        @default(now())
 }

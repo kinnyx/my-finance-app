@@ -14,6 +14,15 @@ export default function TransactionList({
     // สร้าง State สำหรับเก็บ ID ที่ถูกเลือก
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
+    const CATEGORY_ICONS: Record<string, string> = {
+        FOOD: "🍔",
+        TRANSPORT: "🚗",
+        SHOPPING: "🛍️",
+        BILL: "🧾",
+        INCOME: "💰",
+        OTHER: "✨",
+    };
+
     // ฟังก์ชันสลับการเลือก (Toggle)
     const toggleSelect = (id: string) => {
         setSelectedIds((prev) =>
@@ -57,12 +66,18 @@ export default function TransactionList({
                             className="w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer" 
                         />
 
-                        {/* ข้อมูลรายการ */}
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-slate-800 truncate">{item.title}</p>
-                            <p className="text-[10px] text-slate-400 font-medium italic">
-                                {new Date(item.createdAt).toLocaleDateString('th-TH')}
-                            </p>
+                        <div className="flex-1 min-w-0 flex items-center gap-3">
+                            <div className="w-10 h-10 bg-white shadow-sm border border-slate-100 rounded-full flex items-center justify-center text-lg shrink-0">
+                                {CATEGORY_ICONS[item.category] || "✨"}
+                            </div>
+
+                            {/* ข้อมูลรายการ */}
+                            <div>
+                                <p className="text-sm font-semibold text-slate-800 truncate">{item.title}</p>
+                                <p className="text-[10px] text-slate-400 font-medium italic">
+                                    {new Date(item.createdAt).toLocaleDateString('th-TH')}
+                                </p>
+                            </div>
                         </div>
 
                         {/* ยอดเงิน */}

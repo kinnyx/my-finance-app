@@ -54,7 +54,7 @@ export default function AddTransactionModal({ variant = "full" }: { variant?: "f
                                         name="title" 
                                         type="text"
                                         placeholder="เช่น ค่ากาแฟ, เงินเดือน"
-                                        className="w-full p-3 bg-slate-50 border-none rounded-2xl outline focus:ring-2 focus:ring-blue-500 transition"
+                                        className="w-full mt-1 p-4 bg-slate-50 rounded-2xl border-none outline-none text-slate-900 placeholder:text-slate-300 focus:ring-2 focus:ring-blue-500 transition"
                                         required
                                     />
                                 </div>
@@ -66,7 +66,7 @@ export default function AddTransactionModal({ variant = "full" }: { variant?: "f
                                         type="number" 
                                         step="0.01" 
                                         placeholder="0.00" 
-                                        className="w-full p-3 bg-slate-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition text-2xl font-bold"
+                                        className="w-full mt-1 p-4 bg-slate-50 rounded-2xl border-none outline-none text-slate-900 placeholder:text-slate-300 focus:ring-2 focus:ring-blue-500 transition text-2xl font-bold"
                                         required 
                                     />
                                 </div>
@@ -74,10 +74,25 @@ export default function AddTransactionModal({ variant = "full" }: { variant?: "f
                                 <div className="flex gap-2 p-1 bg-slate-100 rounded-2xl">
                                     <select 
                                         name="type" 
-                                        className="w-full p-3 bg-transparent outline-none font-medium cursor-pointer"
+                                        className="w-full mt-1 p-4 bg-slate-50 border-none outline-none text-slate-900 focus:ring-2 focus:ring-blue-500 transition cursor-pointer"
                                     >
                                         <option value="EXPENSE">🔴 รายจ่าย</option>
                                         <option value="INCOME">🟢 รายรับ</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="text-xs font-bold text-slate-500 uppercase ml-1">หมวดหมู่</label>
+                                    <select 
+                                        name="category" 
+                                        className="w-full mt-1 p-4 bg-slate-50 rounded-2xl border-none outline-none text-slate-900 focus:ring-2 focus:ring-blue-500 transition cursor-pointer"
+                                    >
+                                        <option value="FOOD">🍔 อาหารและเครื่องดื่ม</option>
+                                        <option value="TRANSPORT">🚗 การเดินทาง</option>
+                                        <option value="SHOPPING">🛍️ ช้อปปิ้ง</option>
+                                        <option value="BILL">🧾 บิล/ค่าใช้จ่าย</option>
+                                        <option value="INCOME">💰 รายได้</option>
+                                        <option value="OTHER">✨ อื่นๆ</option>
                                     </select>
                                 </div>
 

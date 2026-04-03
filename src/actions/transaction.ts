@@ -15,6 +15,7 @@ export async function createTransaction(formData: FormData) {
     const title = formData.get("title") as string;
     const amount = parseFloat(formData.get("amount") as string);
     const type = formData.get("type") as string;
+    const category = formData.get("category") as string;
 
     // 2. ตรวจสอบข้อมูลเบื้องต้น (Validation)
     if (!title || isNaN(amount)) return;
@@ -25,6 +26,7 @@ export async function createTransaction(formData: FormData) {
             title: title,
             amount: amount,
             type: type, // "INCOME" หรือ "EXPENSE"
+            category,
             userId: session.user.id,
         },
     });
