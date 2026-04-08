@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createTransaction } from "@/actions/transaction";
 
-export default function AddTransactionModal({ variant = "full" }: { variant?: "full" | "mini" }) {
+export default function AddTransactionModal({ variant = "full", walletId }: { variant?: "full" | "mini", walletId: string }) {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -42,8 +42,9 @@ export default function AddTransactionModal({ variant = "full" }: { variant?: "f
 
                             {/* ฟอร์มที่เราเคยทำไว้ (ยกมาใส่ที่นี่) */}
                             <form 
-                                action={async (FormData) => {
-                                    await createTransaction(FormData);
+                                action={async (formData) => {
+                                    formData.append("walletId", walletId);
+                                    await createTransaction(formData);
                                     setIsOpen(false); // บันทึกเสร็จให้ปิด Popup อัตโนมัติ
                                 }}
                                 className="space-y-4"

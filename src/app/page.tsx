@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import AddTransactionModal from "@/components/AddTransactionModal";
 import TransactionList from "@/components/TransactionList";
 import Link from "next/link";
+import CreateWalletModal from "@/components/CreateWalletModal";
+import DeleteWalletButton from "@/components/DeleteWalletButton";
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ walletId?: string }> }) {
   const resolvedSearchParams = await searchParams;
@@ -58,51 +60,114 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ w
   const totalBalance = income - expense;
 
   return (
-    <div className="">
+    <div className="flex h-screen bg-slate-500 overflow-hidden">
 
       {/* 👈 แถบด้านซ้าย (Sidebar) สำหรับเลือกแผนการเงิน */}
-      <aside className="">
-        <div className="">
-          <h1 className="">
+      <aside className="w-72 bg-slate-950 text-white flex flex-col shadow-2xl z-10">
+        <div className="p-6 border-b border-slate-800">
+          <h1 className="text-xl font-bold flex items-center gap-2">
             <span>💼</span> My Wallets
           </h1>
         </div>
 
         {/* รายการกระเป๋าเงิน */}
-        <div className="">
-          {/* ตัวอย่างกระเป๋าที่ 1 (สมมติว่าถูกเลือกอยู่) */}
-          <button className="">
-            <p className="">กระเป๋าหลัก</p>
-            <p className="">$ 25,000</p>
-          </button>
-
-          {/* ตัวอย่างกระเป๋าที่ 2 (ไม่ได้ถูกเลือก) */}
-          <button className="">
-            <p className="">เงินเก็บเที่ยวญี่ปุ่น</p>
-            <p className="">$ 5,0000</p>
-          </button>
+        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2 custom-scrollbar">
+          {wallets.length === 0 ? (
+            <div className="text-center text-slate-500 py-4 text-sm">ยังไม่มีกระเป๋าเงิน</div>
+          ) : (
+            wallets.map((wallet) => (
+              <Link
+                key={wallet.id}
+                href={`/?walletId=${wallet.id}`}
+                className={`w-full text-white p-4 rounded-2xl border transition block ${activeWalletId === wallet.id
+                    ? "bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-900/50"
+                    : "bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-white"
+                  }`}
+              >
+                <p className="font-bold text-sm">{wallet.name}</p>
+              </Link>
+            ))
+          )}
         </div>
 
         {/* ปุ่มเพิ่มกระเป๋าเงินใหม่ */}
-        <div className="">
-          <button className="">
+        {/* <div className="p-4 border-t border-slate-800">
+          <button className="w-full py-3 rounded-xl border border-dash border-slate-600 text-slate-400 hover:text-white hover:border-slate-400 transition flex items-center justify-center gap-2">
             <span>+</span> สร้างแผนใหม่
           </button>
-        </div>
+        </div> */}
+        <CreateWalletModal />
 
         {/* ข้อมูล User และปุ่ม Logout */}
-        <div className="">
-          <div className="">
-            <div className="">
+        <div className="p-4 bg-slate-900 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center text-xs font-bold uppercase">
               {session.user.name?.charAt(0)}
             </div>
-            <p className="">{session.user.name}</p>
+            <p className="text-sm font-medium text-slate-300 truncate w-24">{session.user.name}</p>
           </div>
           <form action={async () => { "use server"; await signOut(); }}>
-            <button className="">Log out</button>
+            <button className="text-xs text-rose-400 hover:text-rose-300">Log out</button>
           </form>
         </div>
       </aside>
+
+      {/* พื้นที่หลักด้านขวา (Main Content) */}
+      <main className="flex-1 overflow-y-auto p-8 relative">
+        <div className="max-w-4xl mx-auto flex flex-col gap-6">
+          {activeWallet ? (
+            <>
+              {/* Header ของกระเป๋าที่เลือก */}
+              <div className="flex justify-between items-end mb-4">
+                <div>
+                  <p className="text-slate-500 font-medium mb-1">กำลังดูข้อมูลของ</p>
+                  <div className="flex items-center gap-4">
+                    <h2 className="text-4xl font-bold text-slate-800">{activeWallet.name}</h2>
+                    <DeleteWalletButton walletId={activeWallet.id}/>
+                  </div>
+                </div>
+                <AddTransactionModal variant="mini" walletId={activeWallet.id} />
+              </div>
+
+              {/* Card สรุปยอด และ รายการธุรกรรม */}
+              <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
+                <div className="bg-slate-900 p-8 text-white">
+                  <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mb-1">ยอดเงินคงเหลือ</p>
+                  <h2 className="text-4xl font-bold">$ {totalBalance.toLocaleString()}</h2>
+
+                  <div className="flex gap-6 pt-6 mt-6 border-t border-white/10">
+                    <div>
+                      <p className="text-slate-500 text-[10px] uppercase font-bold mb-1">รายรับ</p>
+                      <p className="text-emerald-400 font-bold text-lg">+ ${income.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500 text-[10px] uppercase font-bold mb-1">รายจ่าย</p>
+                      <p className="text-rose-400 font-bold text-lg">- ${expense.toLocaleString()}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-2">
+                  <div className="px-4 py-3 flex justify-between items-center">
+                    <h3 className="font-bold text-slate-800 text-sm">รายการล่าสุด</h3>
+                  </div>
+                  <div className="max-h-[500px] overflow-y-auto custom-scrollbat">
+                    <TransactionList transactions={transactions} isNested={true} />
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="w-full flex flex-col items-center justify-center text-slate-400 mt-32">
+              <div className="text-6xl mb-4">💼</div>
+              <h2 className="text-2xl font-bold text-slate-600 mb-2">ยังไม่มีกระเป๋าเงิน</h2>
+              <p>กรุณาสร้างกระเป๋าเงินที่แถบด้านซ้ายเพื่อเริ่มต้นใช้งาน</p>
+            </div>
+          )}
+
+        </div>
+      </main>
+
     </div>
-  )
+  );
 }

@@ -16,18 +16,21 @@ export async function createTransaction(formData: FormData) {
     const amount = parseFloat(formData.get("amount") as string);
     const type = formData.get("type") as string;
     const category = formData.get("category") as string;
+    const walletId = formData.get("walletId") as string;
 
     // 2. ตรวจสอบข้อมูลเบื้องต้น (Validation)
     if (!title || isNaN(amount)) return;
 
+    if (!walletId) throw new Error ("Missing Wallet ID");
+
     // 3. บันทึกลง Database ผ่าน Prisma
     await db.transaction.create({
         data: {
-            title: title,
-            amount: amount,
-            type: type, // "INCOME" หรือ "EXPENSE"
+            title,
+            amount,
+            type, // "INCOME" หรือ "EXPENSE"
             category,
-            userId: session.user.id,
+            walletId,
         },
     });
 
