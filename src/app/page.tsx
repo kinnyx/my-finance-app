@@ -5,9 +5,12 @@ import TransactionList from "@/components/TransactionList";
 import Link from "next/link";
 import CreateWalletModal from "@/components/CreateWalletModal";
 import DeleteWalletButton from "@/components/DeleteWalletButton";
+import DailyTransactionList from "@/components/DailyTransactionList";
+import TransactionFilter from "@/components/TransactionFilter";
 
-export default async function Home({ searchParams }: { searchParams: Promise<{ walletId?: string }> }) {
+export default async function Home({ searchParams }: { searchParams: Promise<{ walletId?: string, startDate?: string, endDate?: string }> }) {
   const resolvedSearchParams = await searchParams;
+  const { walletId: urlWalletId, startDate, endDate } = resolvedSearchParams;
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -42,8 +45,26 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ w
   // ดึงข้อมูล Transaction เฉพาะของกระเป๋าที่เลือก
   let transactions: any[] = [];
   if (activeWalletId) {
+    // กำหนดเงื่อนไขเริ่มต้น คือต้องอยู่ในกระเป๋าที่เลือก
+    let whereClause: any = { walletId: activeWalletId };
+
+    // ถ้ามีการเลือกวันที่ ให้เพิ่มเงื่อนไข
+    if (startDate || endDate) {
+      whereClause.createdAt = {};
+
+      // gte = Greater Than or Equal (มากกว่าหรือเท่ากัน)
+      if (startDate) {
+        whereClause.createdAt.gte = new Date(`${startDate}T00:00:00.000Z`);
+      }
+
+      // lte = Less Than or Equal (น้อยกว่าหรือเท่ากัน)
+      if (endDate) {
+        whereClause.createdAt.lte = new Date(`${endDate}T23:59:59.999Z`);
+      }
+    }
+
     transactions = await db.transaction.findMany({
-      where: { walletId: activeWalletId },
+      where: whereClause,
       orderBy: { createdAt: "desc" },
     });
   }
@@ -148,11 +169,19 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ w
                 </div>
 
                 <div className="p-2">
-                  <div className="px-4 py-3 flex justify-between items-center">
+                  <div className="px-4 py-3 flex justify-between items-center mb-2">
                     <h3 className="font-bold text-slate-800 text-sm">รายการล่าสุด</h3>
+                    <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded-full font-bold">
+                      {transactions.length} รายการ
+                    </span>
                   </div>
-                  <div className="max-h-[500px] overflow-y-auto custom-scrollbat">
-                    <TransactionList transactions={transactions} isNested={true} />
+
+                  <div className="px-2">
+                    <TransactionFilter />
+                  </div>
+
+                  <div className="max-h-[500px] overflow-y-auto custom-scrollbar">
+                    <DailyTransactionList transactions={transactions} />
                   </div>
                 </div>
               </div>

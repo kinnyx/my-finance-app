@@ -5,6 +5,7 @@ import { createTransaction } from "@/actions/transaction";
 
 export default function AddTransactionModal({ variant = "full", walletId }: { variant?: "full" | "mini", walletId: string }) {
     const [isOpen, setIsOpen] = useState(false);
+    const today = new Date().toISOString().split('T')[0];
 
     return (
         <>
@@ -49,6 +50,16 @@ export default function AddTransactionModal({ variant = "full", walletId }: { va
                                 }}
                                 className="space-y-4"
                             >
+                                <div>
+                                    <label className="text-sm font-medium text-slate-500 mb-1 block">วันที่ทำรายการ</label>
+                                    <input 
+                                        name="createdAt" 
+                                        type="date" 
+                                        defaultValue={today} 
+                                        className="w-full mt-1 p-4 bg-slate-50 rounded-2xl border-none outline-none text-slate-900 focus:ring-2 focus:ring-blue-500 transition cursor-pointer" 
+                                        required 
+                                    />
+                                </div>
                                 <div>
                                     <label className="text-sm font-medium text-slate-500 mb-1 block">ชื่อรายการ</label>
                                     <input 
